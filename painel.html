@@ -1,0 +1,554 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://inwzwyveohgpmrrwqcmv.supabase.co; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Painel · Delícias do Chef Viini</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#0B0B0C;--panel:#141416;--line:#2A2A2E;--gold:#C9A24A;--gold2:#E8CC8A;--txt:#F4EFE6;--mut:#9A9388;--red:#B5483A;--green:#5E9E6E}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;font-size:14px}
+h1,h2,h3{font-family:'Playfair Display',serif;font-weight:700;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+.btn{background:linear-gradient(135deg,var(--gold),#A9822F);color:#0B0B0C;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 14px;cursor:pointer}
+.ghost:hover{border-color:var(--gold);color:var(--gold2)}
+.danger{background:transparent;border:1px solid #4a2a26;color:#E0877A;border-radius:8px;padding:6px 10px;cursor:pointer}
+input,select,textarea{background:#1B1B1E;border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+/* login */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 20%,#1d1708 0%,#0B0B0C 60%)}
+.lbox{width:min(400px,92vw);background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:38px 32px;box-shadow:0 30px 80px rgba(0,0,0,.6);text-align:center}
+.lbox .mark{font-family:'Playfair Display';font-size:26px;color:var(--gold2);letter-spacing:.5px}
+.lbox .sub{font-size:10px;letter-spacing:3px;color:var(--gold);margin:6px 0 26px;text-transform:uppercase}
+.lbox input{margin-bottom:12px}
+/* app */
+#app{display:none;min-height:100vh;grid-template-columns:240px 1fr}
+#app.on{display:grid}
+aside{background:#0F0F11;border-right:1px solid var(--line);padding:26px 16px;display:flex;flex-direction:column;gap:6px}
+.brand{font-family:'Playfair Display';color:var(--gold2);font-size:19px;padding:0 10px 18px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.brand small{display:block;font-family:Inter;font-size:9px;letter-spacing:2.5px;color:var(--gold);margin-top:4px}
+.nav{background:none;border:0;text-align:left;padding:11px 14px;border-radius:10px;color:var(--mut);cursor:pointer;font-weight:500}
+.nav:hover{color:var(--txt);background:#1A1A1D}
+.nav.on{color:var(--gold2);background:linear-gradient(90deg,rgba(201,162,74,.16),transparent);box-shadow:inset 3px 0 0 var(--gold)}
+.sair{margin-top:auto}
+.sair a,.sair button{width:100%}
+main{padding:32px 36px;overflow:auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+.top h2{font-size:28px}.top .muted{color:var(--mut);font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.grid{display:grid;gap:16px}.k4{grid-template-columns:repeat(4,1fr)}.k2{grid-template-columns:1fr 1fr}
+.card{background:linear-gradient(180deg,#17171A,#121214);border:1px solid var(--line);border-radius:18px;padding:20px}
+.card.gold{border-color:rgba(201,162,74,.35)}
+.kpi .l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
+.kpi .v{font-family:'Playfair Display';font-size:26px;color:var(--gold2);margin-top:8px}
+.kpi .s{font-size:12px;color:var(--mut);margin-top:4px}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--mut);text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+td{padding:12px 8px;border-bottom:1px solid #1E1E22;vertical-align:middle}
+tr:hover td{background:#17171A}
+.tag{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid}
+.t-ok{color:var(--green);border-color:#2f5b3d}.t-warn{color:var(--gold2);border-color:#6b5423}.t-bad{color:#E0877A;border-color:#5a2c27}.t-mut{color:var(--mut);border-color:var(--line)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;align-items:end;margin-bottom:18px}
+.form label{font-size:10px;letter-spacing:1.5px;color:var(--mut);text-transform:uppercase;display:block;margin-bottom:5px}
+.empty{color:var(--mut);padding:30px;text-align:center;border:1px dashed var(--line);border-radius:14px}
+.bar{height:8px;background:#222;border-radius:99px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.sect{margin:0 0 14px;font-size:18px;color:var(--gold2)}
+.msg{font-size:12px;color:#E0877A;min-height:16px;margin-top:6px}
+@media(max-width:900px){#app.on{grid-template-columns:1fr}aside{flex-direction:row;overflow-x:auto;padding:12px}.brand{display:none}.k4{grid-template-columns:1fr 1fr}.k2{grid-template-columns:1fr}main{padding:20px}}
+</style></head><body>
+
+<section id="login"><div class="lbox">
+  <div class="mark">Delícias do Chef Viini</div>
+  <div class="sub">Área restrita</div>
+  <input id="le" type="email" placeholder="E-mail" autocomplete="username">
+  <input id="lp" type="password" placeholder="Senha" autocomplete="current-password">
+  <button class="btn" style="width:100%;margin-top:6px" onclick="entrar()">Entrar</button>
+  <div class="msg" id="lmsg"></div>
+</div></section>
+
+<div id="app">
+  <aside>
+    <div class="brand">Delícias do Chef Viini<small>Painel de gestão</small></div>
+    <button class="nav on" data-v="dash" onclick="ir('dash')">Visão geral</button>
+    <button class="nav" data-v="ped" onclick="ir('ped')">Pedidos <span id="badge-site" class="tag t-warn" style="display:none;padding:1px 8px">0</span></button>
+    <button class="nav" data-v="prod" onclick="ir('prod')">Produção</button>
+    <button class="nav" data-v="cli" onclick="ir('cli')">Clientes</button>
+    <button class="nav" data-v="est" onclick="ir('est')">Estoque</button>
+    <button class="nav" data-v="fin" onclick="ir('fin')">Financeiro</button>
+    <button class="nav" data-v="rel" onclick="ir('rel')">Relatórios</button>
+    <button class="nav" data-v="cup" onclick="ir('cup')">Cupons</button>
+    <button class="nav" data-v="pro" onclick="ir('pro')">Produtos</button>
+    <button class="nav" data-v="ent" onclick="ir('ent')">Entregas</button>
+    <div class="sair" style="display:flex;flex-direction:column;gap:8px">
+      <a class="ghost" href="index.html" style="text-align:center;text-decoration:none;display:block">← Voltar ao site</a>
+      <button class="ghost" onclick="sair()">Sair</button>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script>
+const URL_SB='https://inwzwyveohgpmrrwqcmv.supabase.co', KEY='sb_publishable_DHogUrK5pbgT5yrCjg3c7A_t8JZJCUR';
+const sb = (typeof supabase!=='undefined') ? supabase.createClient(URL_SB, KEY) : null;
+const T = {clientes:[], pedidos:[], estoque:[], despesas:[], cupons:[], produtos:[], contas:[], config:[], pedidos_site:[]};
+const CFG=()=>T.config[0]||{metaFaturamento:0,taxaCartao:3};
+const FORMAS=['Pix','Dinheiro','Cartão'];
+let fichaP=null, precoEditId=null, fPedStatus='', fPedData='', fPedBairro='', fPedBusca='';
+const PROD_KEY='cv_producao_feitos';
+const prodFeitos=()=>{ try{return JSON.parse(localStorage.getItem(PROD_KEY)||'{}');}catch(e){return {};} };
+const CATALOGO=[["Chester Natalino", "Pratos Principais", {"preco": 200}], ["Bacalhau à Brás", "Pratos Principais", {"preco": 230}], ["Bacalhau com Natas", "Pratos Principais", {"preco": 240}], ["Pernil Assado 3kg", "Pratos Principais", {"preco": 180}], ["Lombo Recheado", "Pratos Principais", {"preco": 190}], ["Frango Natalino Recheado", "Pratos Principais", {"preco": 110}], ["Moqueca Paraense", "Pratos Principais", {"preco": 170}], ["Farofa Rica 1kg", "Pratos Principais", {"preco": 60}], ["Arroz de Festa 1kg", "Pratos Principais", {"preco": 60}], ["Peru Tradicional 4kg", "Pratos Principais", {"preco": 220}], ["Picanha Assada 2kg", "Pratos Principais", {"preco": 210}], ["Vatapá Paraense 1kg", "Pratos Principais", {"preco": 75}], ["Empadão de Camarão", "Tortas e Empadões", {"tam": {"P": 100, "M": 135, "G": 175, "GG": 220}}], ["Empadão de Frango", "Tortas e Empadões", {"tam": {"P": 80, "M": 110, "G": 140, "GG": 180}}], ["Torta de Bacalhau", "Tortas e Empadões", {"tam": {"P": 110, "M": 150, "G": 190, "GG": 240}}], ["Empadão de Palmito", "Tortas e Empadões", {"tam": {"P": 80, "M": 110, "G": 140, "GG": 180}}], ["Torta de Camarão", "Tortas e Empadões", {"tam": {"P": 100, "M": 135, "G": 175, "GG": 220}}], ["Torta de Frango Catupiry", "Tortas e Empadões", {"tam": {"P": 85, "M": 115, "G": 145, "GG": 185}}], ["Torta de Carne Seca", "Tortas e Empadões", {"tam": {"P": 90, "M": 120, "G": 155, "GG": 195}}], ["Empadão Goiano", "Tortas e Empadões", {"tam": {"P": 95, "M": 125, "G": 160, "GG": 200}}], ["Torta de Queijo", "Tortas e Empadões", {"tam": {"P": 75, "M": 100, "G": 130, "GG": 165}}], ["Torta de Calabresa", "Tortas e Empadões", {"tam": {"P": 80, "M": 105, "G": 135, "GG": 170}}], ["Torta de Atum", "Tortas e Empadões", {"tam": {"P": 85, "M": 110, "G": 140, "GG": 175}}], ["Pavê de Cupuaçu", "Sobremesas", {"preco": 100}], ["Creme de Bacuri", "Sobremesas", {"preco": 180}], ["Torta de Castanha", "Sobremesas", {"preco": 120}], ["Pavê de Açaí", "Sobremesas", {"preco": 110}], ["Brigadeirão", "Sobremesas", {"preco": 95}], ["Pudim de Leite", "Sobremesas", {"preco": 85}], ["Mousse de Maracujá", "Sobremesas", {"preco": 90}], ["Torta de Limão", "Sobremesas", {"preco": 100}], ["Cheesecake Cupuaçu", "Sobremesas", {"preco": 130}]];
+let cliBusca='', cliFicha=null, editId=null;
+const STATUS = ['Aguardando','Confirmado','Produzindo','Entregue','Cancelado'];
+let view='dash';
+const CAT=[['Pernil Assado 3kg',180],['Chester Natalino',200],['Peru Tradicional 4kg',220],['Bacalhau à Brás',230],['Bacalhau com Natas',240],['Moqueca Paraense',170],['Picanha Assada 2kg',210],['Lombo Recheado',190],['Frango Natalino Recheado',110],['Arroz de Festa 1kg',60],['Farofa Rica 1kg',60],['Vatapá Paraense 1kg',75]];
+let novo={itens:[],c:{}}, novoAberto=false, relFiltro='todos';
+const CAMPOS=[['pn','cliente','Cliente'],['pt','tel','WhatsApp'],['pb','bairro','Bairro'],['pe','endereco','Endereço'],['pd','data','Data de entrega']];
+function guardaCampos(){ CAMPOS.forEach(([id,k])=>{ const el=document.getElementById(id); if(el) novo.c[k]=el.value; }); }
+const R = n => 'R$ '+Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+
+async function entrar(){
+  if(!sb){ $('lmsg').textContent='Sistema indisponível agora.'; return; }
+  const r = await sb.auth.signInWithPassword({email:$('le').value.trim(), password:$('lp').value});
+  if(r.error){ $('lmsg').textContent='E-mail ou senha inválidos.'; return; }
+  abrir();
+}
+let ultimaAtividade=Date.now();
+function marcaAtividade(){ ultimaAtividade=Date.now(); }
+async function sair(){ if(sb) await sb.auth.signOut(); location.reload(); }
+async function abrir(){
+  $('login').style.display='none'; $('app').classList.add('on');
+  await carregar(); await carregarSite(); ir(view);
+  setInterval(async()=>{ await carregarSite(); if(view==='ped') render(); },60000);
+  ['click','keydown','mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,marcaAtividade,{passive:true}));
+  marcaAtividade();
+  setInterval(()=>{ if(Date.now()-ultimaAtividade>30*60*1000){ alert('Sessão encerrada por inatividade.'); sair(); } },30000);
+}
+async function carregarSite(){
+  const {data,error}=await sb.from('pedidos_site').select('id,dados');
+  if(!error&&data) T.pedidos_site=data.map(x=>({...x.dados,_sid:x.id}));
+  const b=document.getElementById('badge-site'); if(b){ b.textContent=T.pedidos_site.length; b.style.display=T.pedidos_site.length?'inline-block':'none'; }
+}
+async function carregar(){
+  for(const t of Object.keys(T)){
+    const {data,error} = await sb.from(t).select('id,dados');
+    if(!error && data) T[t] = data.map(x=>({...x.dados, id:x.id}));
+  }
+}
+let _seq=0;
+const nextId = () => Date.now()*1000 + (_seq++ % 1000);
+async function salvar(t, obj){
+  const row = {...obj}; const id = row.id ?? nextId(); row.id = id;
+  await sb.from(t).upsert({id, dados: row});
+  const i = T[t].findIndex(x=>x.id===id);
+  if(i>=0) T[t][i]=row; else T[t].push(row);
+}
+async function apagar(t, id){
+  if(!confirm('Apagar este registro?')) return;
+  await sb.from(t).delete().eq('id', id);
+  T[t] = T[t].filter(x=>x.id!==id); render();
+}
+function ir(v){
+  view=v; document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b.dataset.v===v)); render();
+}
+function render(){
+  const f={dash:vDash,ped:vPed,prod:vProd,cli:vCli,est:vEst,fin:vFin,rel:vRel,cup:vCup,pro:vProdutos,ent:vEntregas}[view];
+  $('main').innerHTML = f();
+  bind();
+}
+function bind(){}
+
+/* ---------- cálculos ---------- */
+const chave = p => (String(p.tel||'').replace(/\D/g,'') || String(p.cliente||'').toLowerCase().trim());
+function resumoCliente(c){
+  const peds=T.pedidos.filter(p=>p.status!=='Cancelado' && chave(p)===chave(c));
+  const total=peds.reduce((a,p)=>a+Number(p.total||0),0);
+  const ult=peds.map(p=>p.criado||'').sort().pop()||'';
+  const tags=[]; if(total>=500) tags.push(['VIP','t-warn']); if(peds.length>=3) tags.push(['Fiel','t-ok']); if(peds.length===1) tags.push(['Novo','t-mut']);
+  return {peds,total,ult,tags};
+}
+function zapLink(tel,msg){ const n=String(tel||'').replace(/\D/g,''); return 'https://wa.me/55'+n+'?text='+encodeURIComponent(msg); }
+function calc(){
+  const ativos = T.pedidos.filter(p=>p.status!=='Cancelado');
+  const fat = ativos.reduce((a,p)=>a+Number(p.total||0),0);
+  const sinalPago = ativos.filter(p=>p.sinalStatus==='Pago').reduce((a,p)=>a+Number(p.sinal||0),0);
+  const desp = T.despesas.reduce((a,d)=>a+Number(d.valor||0),0);
+  const ticket = ativos.length ? fat/ativos.length : 0;
+  return {fat, sinalPago, saldo:fat-sinalPago, desp, lucro:fat-desp, ticket, n:ativos.length};
+}
+function tagStatus(s){
+  const c = s==='Entregue'||s==='Confirmado' ? 't-ok' : s==='Cancelado' ? 't-bad' : s==='Aguardando' ? 't-mut' : 't-warn';
+  return `<span class="tag ${c}">${esc(s)}</span>`;
+}
+
+/* ---------- visões ---------- */
+function head(kicker,title,extra=''){
+  return `<div class="top"><div><div class="muted">${kicker}</div><h2>${title}</h2></div><div class="row">${extra}</div></div>`;
+}
+function vDash(){
+  const c=calc();
+  const proxim = T.pedidos.filter(p=>p.status!=='Entregue'&&p.status!=='Cancelado').slice(0,6);
+  const estBaixo = T.estoque.filter(e=>Number(e.qtd)<=Number(e.minimo||0));
+  return head('Visão geral','Bem-vindo, Vini')+
+  `<div class="grid k4" style="margin-bottom:16px">
+    ${kpi('Faturamento',R(c.fat),c.n+' pedidos')}
+    ${kpi('Sinal recebido',R(c.sinalPago),'50% confirmado')}
+    ${kpi('Saldo a receber',R(c.saldo),'na entrega')}
+    ${kpi('Lucro líquido',R(c.lucro),'após despesas')}
+  </div>
+  <div class="grid k2">
+    <div class="card gold"><h3 class="sect">Pedidos em andamento</h3>${proxim.length?tabela(['Cliente','Entrega','Total','Status'],proxim.map(p=>[esc(p.cliente),esc(p.dataEntrega||'a combinar'),R(p.total),tagStatus(p.status)])):'<div class="empty">Nenhum pedido em andamento.</div>'}</div>
+    <div class="card"><h3 class="sect">Estoque</h3>${estBaixo.length?estBaixo.map(e=>`<div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid #1E1E22"><span>${esc(e.nome)}</span><span class="tag t-bad">${e.qtd} ${esc(e.unidade||'')}</span></div>`).join(''):'<div class="empty">Estoque em dia.</div>'}</div>
+  </div>`;
+}
+function kpi(l,v,s){return `<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;}
+function tabela(cols,rows){
+  return `<div style="overflow:auto"><table><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+function vPed(){
+  const opts = STATUS.map(s=>`<option>${s}</option>`).join('');
+  const rows = T.pedidos.slice().sort((a,b)=>(b.id||0)-(a.id||0)).map(p=>[
+    `<b>${esc(p.cliente)}</b><div class="muted" style="color:var(--mut);font-size:12px">${esc(p.tel||'')}</div>`,
+    esc(p.bairro||''), esc(p.dataEntrega||'a combinar'), R(p.total), R(p.sinal),
+    `<select style="width:auto;padding:6px 8px" onchange="mudarStatus(${p.id},this.value)">${STATUS.map(s=>`<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select>`,
+    `<button class="danger" onclick="apagar('pedidos',${p.id})">Excluir</button>`
+  ]);
+  const sinalBtn=(p)=>`<button class="ghost" style="padding:6px 10px" onclick="toggleSinal(${p.id})">${p.sinalStatus==='Pago'?'Sinal pago ✓':'Marcar sinal'}</button>`;
+  const saldoBtn=(p)=>`<button class="ghost" style="padding:6px 10px" onclick="toggleSaldo(${p.id})">${p.saldoStatus==='Pago'?'Saldo pago ✓':'Marcar saldo'}</button>`;
+  const formaSel=(p)=>`<select style="width:auto;padding:6px 8px" onchange="mudarForma(${p.id},this.value)">${FORMAS.map(f=>`<option ${f===(p.forma||'Pix')?'selected':''}>${f}</option>`).join('')}</select>`;
+  const datasPed=[...new Set(T.pedidos.map(p=>p.dataEntrega||'a combinar'))].sort();
+  const pedFiltrados=T.pedidos.filter(p=>(!fPedStatus||p.status===fPedStatus)&&(!fPedData||(p.dataEntrega||'a combinar')===fPedData)&&(!fPedBairro||String(p.bairro||'').toLowerCase().includes(fPedBairro.toLowerCase()))&&(!fPedBusca||String(p.cliente||'').toLowerCase().includes(fPedBusca.toLowerCase())||String(p.tel||'').includes(fPedBusca)));
+  const filtros=`<div class="card" style="margin-bottom:16px"><div class="form">
+    <div><label>Status</label><select id="fs" onchange="fPedStatus=this.value;render()"><option value="">Todos</option>${STATUS.map(x=>`<option ${x===fPedStatus?'selected':''}>${x}</option>`).join('')}</select></div>
+    <div><label>Entrega</label><select id="fd" onchange="fPedData=this.value;render()"><option value="">Todas</option>${datasPed.map(x=>`<option ${x===fPedData?'selected':''}>${esc(x)}</option>`).join('')}</select></div>
+    <div><label>Bairro</label><input id="fb" value="${esc(fPedBairro)}" oninput="fPedBairro=this.value;render();document.getElementById('fb').focus()"></div>
+    <div><label>Buscar cliente ou WhatsApp</label><input id="fq" value="${esc(fPedBusca)}" oninput="fPedBusca=this.value;render();document.getElementById('fq').focus()"></div>
+    <div><button class="ghost" onclick="fPedStatus='';fPedData='';fPedBairro='';fPedBusca='';render()">Limpar filtros</button></div></div>
+    <div class="msg" style="color:var(--mut)">${pedFiltrados.length} de ${T.pedidos.length} pedido(s)</div></div>`;
+  const rows2=pedFiltrados.slice().sort((a,b)=>(b.id||0)-(a.id||0)).map(p=>[
+    `<b>${esc(p.cliente)}</b><div style="color:var(--mut);font-size:12px">${esc(p.tel||'')}</div>`,
+    esc(p.bairro||''), esc(p.dataEntrega||'a combinar'), R(p.total), R(p.sinal)+'<div>'+sinalBtn(p)+'</div>', formaSel(p)+'<div style="margin-top:6px">'+saldoBtn(p)+'</div>',
+    `<select style="width:auto;padding:6px 8px" onchange="mudarStatus(${p.id},this.value)">${STATUS.map(s=>`<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select>`,
+    `<div class="row">${PROX[p.status]?`<button class="btn" style="padding:6px 10px" onclick="avancarStatus(${p.id})">→ ${PROX[p.status]}</button>`:''}<button class="danger" onclick="apagar('pedidos',${p.id})">Excluir</button></div>`
+  ]);
+  const itensHtml=novo.itens.map((i,ix)=>`<div class="row" style="justify-content:space-between;border-bottom:1px solid #1E1E22;padding:6px 0"><span>${i.qtd}x ${esc(i.nome)}</span><span>${R(i.qtd*i.preco)} <button class="danger" onclick="rmItem(${ix})">×</button></span></div>`).join('');
+  const totalNovo=novo.itens.reduce((a,i)=>a+i.qtd*i.preco,0);
+  const form=novoAberto?`<div class="card gold" style="margin-bottom:16px"><h3 class="sect">${editId?'Editar pedido':'Novo pedido'}</h3>
+    <div class="form"><div><label>Cliente</label><input id="pn" value="${esc(novo.c.cliente||'')}"></div><div><label>WhatsApp</label><input id="pt" value="${esc(novo.c.tel||'')}"></div>
+    <div><label>Bairro</label><input id="pb" value="${esc(novo.c.bairro||'')}"></div><div><label>Endereço</label><input id="pe" value="${esc(novo.c.endereco||'')}"></div>
+    <div><label>Data de entrega</label><input id="pd" placeholder="ex.: 24/12" value="${esc(novo.c.data||'')}"></div></div>
+    <div class="form"><div><label>Prato</label><select id="pp">${(T.produtos.length?T.produtos.filter(x=>x.status!=='Pausado').flatMap(x=>x.tam?['P','M','G','GG'].map(k=>[`${x.nome} (${k})`,x.tam[k]]):[[x.nome,x.preco]]):CAT).map(c=>`<option value="${esc(c[0])}|${c[1]}">${esc(c[0])} • ${R(c[1])}</option>`).join('')}</select></div>
+    <div><label>Quantidade</label><input id="pq" type="number" min="1" value="1"></div><div><button class="ghost" onclick="addItem()">Adicionar item</button></div></div>
+    ${itensHtml||'<div class="empty" style="padding:14px">Nenhum item adicionado.</div>'}
+    <div class="row" style="justify-content:space-between;margin-top:14px"><div><b>Total</b> <span style="color:var(--gold2);font-size:20px">${R(totalNovo)}</span><div style="color:var(--mut);font-size:12px">Sinal de 50%: ${R(totalNovo/2)}</div></div>
+    <div class="row"><button class="ghost" onclick="cancelNovo()">Cancelar</button><button class="btn" onclick="salvarNovo()">${editId?'Salvar alterações':'Salvar pedido'}</button></div></div>
+    <div class="msg" id="pmsg"></div></div>`:'';
+  const site=T.pedidos_site.slice().sort((a,b)=>String(b.criado).localeCompare(String(a.criado)));
+  const siteHtml=site.length?`<div class="card gold" style="margin-bottom:16px"><h3 class="sect">Novos pedidos do site (${site.length})</h3>${site.map(x=>`<div class="row" style="justify-content:space-between;border-bottom:1px solid #1E1E22;padding:10px 0"><div><b>${esc(x.cliente)}</b> <span style="color:var(--mut)">${esc(x.tel||'')} • ${esc(x.bairro||'')} • entrega ${esc(x.dataEntrega||'a combinar')}</span><div style="color:var(--mut);font-size:12px">${(x.itens||[]).map(i=>i.qtd+'x '+esc(i.nome)).join(', ')} • <b style="color:var(--gold2)">${R(x.total)}</b></div></div><div class="row"><button class="btn" onclick="importarSite('${x._sid}')">Importar</button><button class="danger" onclick="descartarSite('${x._sid}')">Descartar</button></div></div>`).join('')}</div>`:'';
+  return head('Pedidos','Pedidos', `<button class="btn" onclick="toggleNovo()">+ Novo pedido</button>`)+siteHtml+filtros+form+
+  `<div class="card">${rows2.length?tabela(['Cliente','Bairro','Entrega','Total','Sinal','Forma','Saldo','Status',''],rows2):'<div class="empty">Nenhum pedido ainda. Use "Novo pedido" para lançar os que chegarem pelo WhatsApp.</div>'}</div>`;
+}
+window.toggleNovo=()=>{ novoAberto=!novoAberto; if(!novoAberto) novo={itens:[],c:{}}; render(); };
+window.cancelNovo=()=>{ editId=null; novoAberto=false; novo={itens:[],c:{}}; render(); };
+window.addItem=()=>{ guardaCampos(); const [nome,preco]=$('pp').value.split('|'); const q=Math.max(1,Number($('pq').value||1)); const e=novo.itens.find(i=>i.nome===nome); if(e) e.qtd+=q; else novo.itens.push({nome,preco:Number(preco),qtd:q}); render(); };
+window.rmItem=(ix)=>{ guardaCampos(); novo.itens.splice(ix,1); render(); };
+window.salvarNovo=async ()=>{
+  const cliente=$('pn').value.trim(); const tel=$('pt').value.trim();
+  if(cliente.length<3){ $('pmsg').textContent='Informe o nome do cliente.'; return; }
+  if(!novo.itens.length){ $('pmsg').textContent='Adicione pelo menos um item.'; return; }
+  const total=novo.itens.reduce((a,i)=>a+i.qtd*i.preco,0);
+  const antigo=editId?T.pedidos.find(x=>x.id===editId):null;
+  await salvar('pedidos',{...(antigo||{}),id:editId||undefined,cliente,tel,bairro:$('pb').value.trim(),endereco:$('pe').value.trim(),dataEntrega:$('pd').value.trim(),itens:novo.itens,total,sinal:antigo?antigo.sinal:total/2,sinalStatus:antigo?antigo.sinalStatus:'Pendente',status:antigo?antigo.status:'Aguardando',criado:antigo?antigo.criado:new Date().toISOString()});
+  editId=null; novoAberto=false; novo={itens:[],c:{}}; render();
+};
+window.importarSite=async (sid)=>{
+  const x=T.pedidos_site.find(y=>y._sid===sid); if(!x) return;
+  const {_sid,...d}=x;
+  await salvar('pedidos',{cliente:d.cliente,tel:d.tel,bairro:d.bairro,endereco:[d.endereco,d.complemento].filter(Boolean).join(' - '),dataEntrega:d.dataEntrega,itens:(d.itens||[]).map(i=>({nome:i.nome,qtd:i.qtd,preco:i.preco})),total:Number(d.total||0),sinal:Number(d.sinal||0),sinalStatus:'Pendente',saldoStatus:'Pendente',forma:d.pagamentoSaldo||'Pix',cupom:d.cupom||'',taxaCartao:Number(d.taxaCartao||0),status:'Aguardando',criado:d.criado,origem:'site',obs:d.obs||''});
+  await sb.from('pedidos_site').delete().eq('id',sid);
+  T.pedidos_site=T.pedidos_site.filter(y=>y._sid!==sid); render();
+};
+window.descartarSite=async (sid)=>{ if(!confirm('Descartar este pedido do site?')) return; await sb.from('pedidos_site').delete().eq('id',sid); T.pedidos_site=T.pedidos_site.filter(y=>y._sid!==sid); render(); };
+const PROX={ 'Aguardando':'Confirmado','Confirmado':'Produzindo','Produzindo':'Entregue' };
+window.avancarStatus=async (id)=>{ const p=T.pedidos.find(x=>x.id===id); if(!p) return; const nxt=PROX[p.status]; if(!nxt) return; await mudarStatus(id,nxt); };
+window.marcarProd=(k,v)=>{ const f=prodFeitos(); if(v) f[k]=true; else delete f[k]; localStorage.setItem(PROD_KEY,JSON.stringify(f)); render(); };
+window.toggleSaldo=async (id)=>{ const p=T.pedidos.find(x=>x.id===id); if(!p) return; await salvar('pedidos',{...p,saldoStatus:p.saldoStatus==='Pago'?'Pendente':'Pago'}); render(); };
+window.mudarForma=async (id,f)=>{ const p=T.pedidos.find(x=>x.id===id); if(!p) return; await salvar('pedidos',{...p,forma:f}); render(); };
+window.toggleSinal=async (id)=>{ const p=T.pedidos.find(x=>x.id===id); if(!p) return; await salvar('pedidos',{...p,sinalStatus:p.sinalStatus==='Pago'?'Pendente':'Pago'}); render(); };
+window.mudarStatus = async (id,st)=>{
+  const p=T.pedidos.find(x=>x.id===id); if(!p) return;
+  let baixa=!!p.baixa;
+  if(st==='Produzindo' && !baixa){ await baixarEstoque(p,-1); baixa=true; }
+  if(st==='Cancelado' && baixa){ await baixarEstoque(p,1); baixa=false; }
+  await salvar('pedidos',{...p,status:st,baixa}); render();
+};
+async function baixarEstoque(p,sinal){
+  for(const it of (p.itens||[])){
+    const prod=T.produtos.find(x=>x.nome===it.nome); if(!prod) continue;
+    for(const f of (prod.ficha||[])){
+      const e=T.estoque.find(x=>x.id===Number(f.ingId)); if(!e) continue;
+      const nova=Math.max(0, Number(e.qtd||0)+sinal*Number(f.qtd||0)*Number(it.qtd||0));
+      await salvar('estoque',{...e,qtd:Math.round(nova*1000)/1000});
+    }
+  }
+}
+const custoProd = p => (p.ficha||[]).reduce((a,f)=>{ const e=T.estoque.find(x=>x.id===Number(f.ingId)); return a+(e?Number(e.custo||0)*Number(f.qtd||0):0); },0);
+function vProd(){
+  const dias={};
+  T.pedidos.filter(p=>p.status!=='Cancelado'&&p.status!=='Entregue').forEach(p=>{
+    const d=p.dataEntrega||'a combinar'; dias[d]=dias[d]||{};
+    (p.itens||[]).forEach(i=>{ dias[d][i.nome]=(dias[d][i.nome]||0)+Number(i.qtd||0); });
+  });
+  const blocos = Object.keys(dias).sort().map(d=>`<div class="card" style="margin-bottom:14px"><h3 class="sect">Entrega ${esc(d)}</h3>${tabela(['Prato','Quantidade'],Object.entries(dias[d]).map(([n,q])=>[esc(n),`<b>${q}</b>`]))}</div>`).join('');
+  const need={};
+  T.pedidos.filter(p=>!p.baixa && p.status!=='Cancelado' && p.status!=='Entregue').forEach(p=>(p.itens||[]).forEach(it=>{
+    const prod=T.produtos.find(x=>x.nome===it.nome); if(!prod) return;
+    (prod.ficha||[]).forEach(f=>{ need[f.ingId]=(need[f.ingId]||0)+Number(f.qtd||0)*Number(it.qtd||0); });
+  }));
+  const compras=Object.entries(need).map(([id,q])=>{ const e=T.estoque.find(x=>x.id===Number(id)); if(!e) return null;
+    const falta=Math.max(0,q-Number(e.qtd||0)); return [esc(e.nome), `${Math.round(q*100)/100} ${esc(e.unidade||'')}`, `${e.qtd} ${esc(e.unidade||'')}`, falta>0?`<b style="color:var(--gold2)">${Math.round(falta*100)/100} ${esc(e.unidade||'')}</b>`:'<span class="tag t-ok">OK</span>']; }).filter(Boolean);
+  const lista=compras.length?`<div class="card" style="margin-top:16px"><h3 class="sect">Lista de compras</h3>${tabela(['Ingrediente','Necessário','Em estoque','Comprar'],compras)}</div>`:'';
+  const feitos=prodFeitos();
+  const marcados=Object.keys(dias).sort().map(d=>{ const itens=Object.entries(dias[d]); if(!itens.length) return ''; return `<div class="card" style="margin-bottom:14px"><h3 class="sect">Produção ${esc(d)}</h3>${itens.map(([n,q])=>{const k=d+'|'+n; const ok=!!feitos[k]; return `<div class="row" style="justify-content:space-between;border-bottom:1px solid #1E1E22;padding:10px 0"><label style="display:flex;gap:10px;align-items:center;cursor:pointer;${ok?'text-decoration:line-through;color:var(--mut)':''}"><input type="checkbox" ${ok?'checked':''} onchange="marcarProd(${JSON.stringify(k)},this.checked)" style="width:auto">${esc(n)}</label><b>${q}</b></div>`;}).join('')}</div>`; }).join('');
+  return head('Produção','Produção por data')+(marcados||'<div class="empty">Nenhum pedido para produzir.</div>')+lista;
+}
+function vCli(){
+  if(cliFicha) return vFicha();
+  const form=`<div class="card" style="margin-bottom:16px"><div class="form">
+    <div><label>Nome</label><input id="cn"></div><div><label>WhatsApp</label><input id="ct"></div>
+    <div><label>Bairro</label><input id="cb"></div><div><label>Endereço</label><input id="ce"></div>
+    <div><button class="btn" onclick="addCli()">Cadastrar cliente</button></div></div><div class="msg" id="cmsg"></div></div>`;
+  const q=cliBusca.toLowerCase();
+  const lista=T.clientes.map(c=>({c,r:resumoCliente(c)})).filter(x=>!q||[x.c.nome,x.c.tel,x.c.bairro].join(' ').toLowerCase().includes(q))
+    .sort((x,y)=>y.r.total-x.r.total);
+  const rows=lista.map(({c,r})=>[
+    `<b>${esc(c.nome)}</b> ${r.tags.map(t=>`<span class="tag ${t[1]}">${t[0]}</span>`).join(' ')}`,
+    esc(c.tel||''), esc(c.bairro||''), `${r.peds.length}`, R(r.total), esc(r.ult?r.ult.slice(0,10):'-'),
+    `<div class="row"><button class="ghost" style="padding:6px 10px" onclick="abrirFicha(${c.id})">Ficha</button>${c.tel?`<a class="ghost" style="padding:6px 10px;text-decoration:none" target="_blank" rel="noopener noreferrer" href="${zapLink(c.tel,'Olá '+(c.nome||'')+'! Aqui é a Delícias do Chef Viini. ')}">WhatsApp</a>`:''}<button class="danger" onclick="apagar('clientes',${c.id})">Excluir</button></div>`]);
+  return head('Clientes','Clientes CRM', `<input placeholder="Buscar nome, telefone ou bairro" value="${esc(cliBusca)}" oninput="cliBusca=this.value;render()" style="width:280px">`)+form+
+    `<div class="card">${rows.length?tabela(['Cliente','WhatsApp','Bairro','Pedidos','Total gasto','Última compra',''],rows):'<div class="empty">Nenhum cliente encontrado.</div>'}</div>`;
+}
+window.abrirFicha=(id)=>{ cliFicha=id; render(); };
+window.fecharFicha=()=>{ cliFicha=null; render(); };
+function vFicha(){
+  const c=T.clientes.find(x=>x.id===cliFicha); if(!c){ cliFicha=null; return vCli(); }
+  const r=resumoCliente(c);
+  const linhas=r.peds.slice().sort((x,y)=>(y.id||0)-(x.id||0)).map(p=>[esc(p.dataEntrega||'a combinar'),(p.itens||[]).map(i=>i.qtd+'x '+esc(i.nome)).join('<br>'),R(p.total),tagStatus(p.status),`<button class="ghost" style="padding:6px 10px" onclick="editarPedido(${p.id})">Editar</button>`]);
+  return head('Ficha do cliente', esc(c.nome), `<button class="ghost" onclick="fecharFicha()">← Voltar</button>`)+
+  `<div class="grid k4" style="margin-bottom:16px">${kpi('Pedidos',r.peds.length,'todos os tempos')}${kpi('Total gasto',R(r.total),'soma dos pedidos')}${kpi('Ticket médio',R(r.peds.length?r.total/r.peds.length:0),'por pedido')}${kpi('Última compra',esc(r.ult?r.ult.slice(0,10):'-'),'data do pedido')}</div>
+  <div class="card gold" style="margin-bottom:16px"><div class="row" style="justify-content:space-between"><div><h3 class="sect" style="margin-bottom:4px">${esc(c.nome)}</h3><div style="color:var(--mut)">${esc(c.tel||'')} • ${esc(c.bairro||'')} • ${esc(c.endereco||'')}</div><div style="margin-top:8px">${r.tags.map(t=>`<span class="tag ${t[1]}">${t[0]}</span>`).join(' ')}</div></div>
+  <div class="row">${c.tel?`<a class="btn" style="text-decoration:none" target="_blank" rel="noopener noreferrer" href="${zapLink(c.tel,'Olá '+(c.nome||'')+'! ')}">Chamar no WhatsApp</a>`:''}<button class="ghost" onclick="novoParaCliente(${c.id})">Novo pedido</button></div></div></div>
+  <div class="card"><h3 class="sect">Histórico de pedidos</h3>${linhas.length?tabela(['Entrega','Itens','Total','Status',''],linhas):'<div class="empty">Este cliente ainda não tem pedidos.</div>'}</div>`;
+}
+window.novoParaCliente=(id)=>{ const c=T.clientes.find(x=>x.id===id); novoAberto=true; novo={itens:[],c:{cliente:c.nome,tel:c.tel,bairro:c.bairro,endereco:c.endereco,data:''}}; editId=null; cliFicha=null; ir('ped'); };
+window.editarPedido=(id)=>{ const p=T.pedidos.find(x=>x.id===id); if(!p) return; editId=id; novoAberto=true; novo={itens:(p.itens||[]).map(i=>({...i})),c:{cliente:p.cliente,tel:p.tel,bairro:p.bairro,endereco:p.endereco,data:p.dataEntrega}}; cliFicha=null; ir('ped'); };
+
+
+const ENT_ST=['Aguardando','A caminho','Entregue','Problema'];
+let entData='';
+function vEntregas(){
+  const datas=[...new Set(T.pedidos.filter(p=>p.status!=='Cancelado').map(p=>p.dataEntrega||'a combinar'))].sort();
+  if(!entData||!datas.includes(entData)) entData=datas[0]||'';
+  const seletor=`<select style="width:auto" onchange="entData=this.value;render()">${datas.map(d=>`<option ${d===entData?'selected':''}>${esc(d)}</option>`).join('')}</select>`;
+  const dia=T.pedidos.filter(p=>p.status!=='Cancelado'&&(p.dataEntrega||'a combinar')===entData);
+  const porBairro={};
+  dia.forEach(p=>{ const b=p.bairro||'Sem bairro'; (porBairro[b]=porBairro[b]||[]).push(p); });
+  const bairros=Object.keys(porBairro).sort();
+  const paradas=bairros.map(b=>{
+    const lista=porBairro[b];
+    const aReceber=lista.reduce((a,p)=>a+(p.saldoStatus==='Pago'?0:Number(p.total||0)-Number(p.sinal||0)*(p.sinalStatus==='Pago'?1:0)),0);
+    const itens=lista.map(p=>`<div class="row" style="justify-content:space-between;padding:10px 0;border-bottom:1px solid #1E1E22">
+      <div><b>${esc(p.cliente)}</b> <span style="color:var(--mut)">${esc(p.endereco||'')}</span><div style="color:var(--mut);font-size:12px">${esc(p.tel||'')} • ${esc((p.itens||[]).map(i=>i.qtd+'x '+i.nome).join(', '))}</div></div>
+      <div class="row"><span>${p.saldoStatus==='Pago'?'<span class="tag t-ok">Pago</span>':'<span class="tag t-warn">Receber '+R(Number(p.total||0)-(p.sinalStatus==='Pago'?Number(p.sinal||0):0))+'</span>'}</span>
+      <select style="width:auto;padding:6px 8px" onchange="mudarEntrega(${p.id},this.value)">${ENT_ST.map(x=>`<option ${x===(p.entrega||'Aguardando')?'selected':''}>${x}</option>`).join('')}</select></div></div>`).join('');
+    return `<div class="card" style="margin-bottom:14px"><div class="row" style="justify-content:space-between"><h3 class="sect" style="margin:0">${esc(b)}</h3><span style="color:var(--mut)">${lista.length} parada(s) • a receber ${R(aReceber)}</span></div>${itens}</div>`;
+  }).join('');
+  const feitas=dia.filter(p=>p.entrega==='Entregue').length;
+  const entregues=dia.filter(p=>p.entrega==='Entregue'||p.status==='Entregue');
+  const aReceberDia=dia.reduce((a,p)=>a+(p.saldoStatus==='Pago'?0:Number(p.total||0)-(p.sinalStatus==='Pago'?Number(p.sinal||0):0)),0);
+  const recebidoDia=dia.reduce((a,p)=>a+(p.saldoStatus==='Pago'?Number(p.total||0)-Number(p.sinal||0):0)+(p.sinalStatus==='Pago'?Number(p.sinal||0):0),0);
+  const fechamento=`<div class="card gold" style="margin-bottom:16px"><h3 class="sect">Fechamento do dia ${esc(entData||'')}</h3><div class="grid k4">${kpi('Entregues',entregues.length+' de '+dia.length,'paradas concluídas')}${kpi('Recebido',R(recebidoDia),'sinais e saldos pagos')}${kpi('A receber',R(aReceberDia),'a cobrar hoje')}${kpi('Total do dia',R(dia.reduce((a,p)=>a+Number(p.total||0),0)),'pedidos da data')}</div></div>`;
+  return head('Entregas','Roteiro de entregas', seletor)+fechamento+
+    `<div class="grid k4" style="margin-bottom:16px">${kpi('Paradas',dia.length,entData||'-')}${kpi('Entregues',feitas,dia.length?Math.round(feitas/dia.length*100)+'% do roteiro':'-')}${kpi('Bairros',bairros.length,'rota por bairro')}${kpi('A receber na entrega',R(dia.reduce((a,p)=>a+(p.saldoStatus==='Pago'?0:Number(p.total||0)-(p.sinalStatus==='Pago'?Number(p.sinal||0):0)),0)),'saldo a cobrar')}</div>`+
+    (paradas||'<div class="empty">Nenhuma entrega nesta data.</div>');
+}
+window.mudarEntrega=async (id,st)=>{ const p=T.pedidos.find(x=>x.id===id); if(!p) return; const upd={...p,entrega:st}; if(st==='Entregue') upd.status='Entregue'; await salvar('pedidos',upd); render(); };
+function vCup(){
+  const form=`<div class="card" style="margin-bottom:16px"><div class="form">
+    <div><label>Código</label><input id="kc" placeholder="NATAL10"></div><div><label>Desconto (%)</label><input id="kp" type="number" min="1" max="100" value="10"></div>
+    <div><label>Válido até</label><input id="kv" type="date"></div><div><label>Limite de usos</label><input id="ku" type="number" min="0" value="0" placeholder="0 = ilimitado"></div>
+    <div><button class="btn" onclick="addCupom()">Criar cupom</button></div></div><div class="msg" id="kmsg"></div></div>`;
+  const usos=c=>T.pedidos.filter(p=>p.status!=='Cancelado'&&String(p.cupom||'').toUpperCase()===String(c.codigo).toUpperCase()).length;
+  const hoje=new Date().toISOString().slice(0,10);
+  const rows=T.cupons.map(c=>{const vencido=c.validade&&c.validade<hoje; const esgotado=c.limite>0&&usos(c)>=c.limite;
+    const st=vencido?'<span class="tag t-bad">Vencido</span>':esgotado?'<span class="tag t-bad">Esgotado</span>':'<span class="tag t-ok">Ativo</span>';
+    return [`<b>${esc(c.codigo)}</b>`,`${c.percentual}%`,esc(c.validade||'sem prazo'),`${usos(c)}${c.limite?' / '+c.limite:''}`,st,`<button class="danger" onclick="apagar('cupons',${c.id})">Excluir</button>`];});
+  return head('Cupons','Cupons de desconto')+form+`<div class="card">${rows.length?tabela(['Código','Desconto','Validade','Usos','Situação',''],rows):'<div class="empty">Nenhum cupom criado.</div>'}</div>`;
+}
+window.addCupom=async ()=>{
+  const codigo=$('kc').value.trim().toUpperCase(); const perc=Number($('kp').value||0);
+  if(codigo.length<3||perc<=0||perc>100){ $('kmsg').textContent='Informe um código (mín. 3 letras) e um desconto entre 1 e 100%.'; return; }
+  if(T.cupons.some(c=>c.codigo===codigo)){ $('kmsg').textContent='Esse código já existe.'; return; }
+  await salvar('cupons',{codigo,percentual:perc,validade:$('kv').value,limite:Number($('ku').value||0)}); render();
+};
+window.addConta=async ()=>{ const d=$('cd').value.trim(), v=Number($('cv').value||0);
+  if(!d||v<=0){ $('cmsg2').textContent='Informe a descrição e o valor.'; return; }
+  await salvar('contas',{tipo:$('ctipo').value,descricao:d,valor:v,vencimento:$('cvv').value,pago:false}); render(); };
+window.toggleConta=async (id)=>{ const x=T.contas.find(y=>y.id===id); if(!x) return; await salvar('contas',{...x,pago:!x.pago}); render(); };
+window.salvarMeta=async ()=>{ const atual=T.config[0]||{}; const dados={...atual,metaFaturamento:Number($('mt').value||0),taxaCartao:Number($('tc').value||0)}; await salvar('config',dados); render(); };
+window.addCli = async ()=>{
+  const nome=$('cn').value.trim(); if(nome.length<3){ $('cmsg').textContent='Informe o nome.'; return; }
+  await salvar('clientes',{nome, tel:$('ct').value.trim(), bairro:$('cb').value.trim(), endereco:$('ce').value.trim()}); render();
+};
+function vEst(){
+  const form=`<div class="card" style="margin-bottom:16px"><div class="form">
+    <div><label>Ingrediente</label><input id="en"></div><div><label>Quantidade</label><input id="eq" type="number" min="0"></div>
+    <div><label>Unidade</label><input id="eu" placeholder="kg, un, L"></div><div><label>Mínimo</label><input id="em" type="number" min="0"></div>
+    <div><label>Custo unit. (R$)</label><input id="ec" type="number" min="0" step="0.01"></div><div><button class="btn" onclick="addEst()">Adicionar</button></div></div><div class="msg" id="emsg"></div></div>`;
+  const rows=T.estoque.map(e=>{const baixo=Number(e.qtd)<=Number(e.minimo||0);return [`<b>${esc(e.nome)}</b>`,`${e.qtd} ${esc(e.unidade||'')}`,e.minimo||0,R(e.custo),baixo?'<span class="tag t-bad">Repor</span>':'<span class="tag t-ok">OK</span>',`<button class="danger" onclick="apagar('estoque',${e.id})">Excluir</button>`]});
+  return head('Estoque','Estoque')+form+`<div class="card">${rows.length?tabela(['Ingrediente','Quantidade','Mínimo','Custo','Situação',''],rows):'<div class="empty">Nenhum ingrediente cadastrado.</div>'}</div>`;
+}
+window.addEst = async ()=>{
+  const nome=$('en').value.trim(); if(!nome){ $('emsg').textContent='Informe o ingrediente.'; return; }
+  await salvar('estoque',{nome, qtd:Number($('eq').value||0), unidade:$('eu').value.trim(), minimo:Number($('em').value||0), custo:Number($('ec').value||0)}); render();
+};
+function agrega(){
+  const ativos=T.pedidos.filter(p=>p.status!=='Cancelado');
+  const porPrato={}, porBairro={}, porData={}, porCli={};
+  ativos.forEach(p=>{
+    (p.itens||[]).forEach(i=>{ const k=i.nome; porPrato[k]=porPrato[k]||{q:0,r:0}; porPrato[k].q+=Number(i.qtd||0); porPrato[k].r+=Number(i.qtd||0)*Number(i.preco||0); });
+    const b=p.bairro||'Não informado'; porBairro[b]=porBairro[b]||{n:0,r:0}; porBairro[b].n++; porBairro[b].r+=Number(p.total||0);
+    const d=p.dataEntrega||'a combinar'; porData[d]=porData[d]||{n:0,r:0}; porData[d].n++; porData[d].r+=Number(p.total||0);
+    const c=p.cliente||'-'; porCli[c]=porCli[c]||{n:0,r:0}; porCli[c].n++; porCli[c].r+=Number(p.total||0);
+  });
+  return {ativos,porPrato,porBairro,porData,porCli};
+}
+function vRel(){
+  const g=agrega(); const c=calc();
+  const pagos=g.ativos.filter(p=>p.sinalStatus==='Pago').length;
+  const ord=(o,k)=>Object.entries(o).sort((a,b)=>b[1][k]-a[1][k]);
+  const tb=(cols,rows)=>rows.length?tabela(cols,rows):'<div class="empty">Sem dados ainda.</div>';
+  return head('Relatórios','Relatórios de vendas',`<button class="ghost" onclick="exportCSV()">Exportar CSV</button><button class="btn" onclick="window.print()">Imprimir</button>`)+
+  `<div class="grid k4" style="margin-bottom:16px">
+    ${kpi('Pedidos ativos',c.n,pagos+' com sinal pago')}${kpi('Faturamento',R(c.fat),'total dos pedidos')}
+    ${kpi('Ticket médio',R(c.ticket),'por pedido')}${kpi('Saldo a receber',R(c.saldo),'após sinal')}</div>
+  <div class="grid k2" style="margin-bottom:16px">
+    <div class="card"><h3 class="sect">Vendas por prato</h3>${tb(['Prato','Qtd','Receita'],ord(g.porPrato,'r').map(([n,v])=>[esc(n),v.q,R(v.r)]))}</div>
+    <div class="card"><h3 class="sect">Vendas por bairro</h3>${tb(['Bairro','Pedidos','Receita'],ord(g.porBairro,'r').map(([n,v])=>[esc(n),v.n,R(v.r)]))}</div>
+    <div class="card"><h3 class="sect">Entregas por data</h3>${tb(['Data','Pedidos','Receita'],ord(g.porData,'r').map(([n,v])=>[esc(n),v.n,R(v.r)]))}</div>
+    <div class="card"><h3 class="sect">Melhores clientes</h3>${tb(['Cliente','Pedidos','Total'],ord(g.porCli,'r').slice(0,10).map(([n,v])=>[esc(n),v.n,R(v.r)]))}</div>
+  </div>`;
+}
+window.exportCSV=()=>{
+  const g=agrega(); const linhas=[['Cliente','Telefone','Bairro','Entrega','Itens','Total','Sinal','Sinal status','Status']];
+  g.ativos.forEach(p=>linhas.push([p.cliente,p.tel||'',p.bairro||'',p.dataEntrega||'',(p.itens||[]).map(i=>i.qtd+'x '+i.nome).join(' | '),p.total||0,p.sinal||0,p.sinalStatus||'',p.status||'']));
+  const csv=linhas.map(l=>l.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})); a.download='pedidos.csv'; a.click();
+};
+function vProdutos(){
+  if(fichaP) return vFichaProd();
+  const semProd = T.produtos.length < CATALOGO.length;
+  const seed = semProd ? `<div class="card gold" style="margin-bottom:16px"><div class="row" style="justify-content:space-between"><div>Importe o cardápio completo: pratos, tortas e sobremesas, com os preços atuais.</div><button class="btn" onclick="importarCardapio()">Importar cardápio completo</button></div></div>` : '';
+  const form=`<div class="card" style="margin-bottom:16px"><div class="form">
+    <div><label>Produto</label><input id="qn"></div><div><label>Categoria</label><select id="qc"><option>Pratos Principais</option><option>Tortas e Empadões</option><option>Sobremesas</option></select></div>
+    <div><label>Preço (R$)</label><input id="qp" type="number" min="0" step="0.01"></div>
+    <div><button class="btn" onclick="addProd()">Cadastrar produto</button></div></div><div class="msg" id="qmsg"></div></div>`;
+  const rows=T.produtos.map(p=>{ const c=custoProd(p); const m=p.preco?Math.round((p.preco-c)/p.preco*100):0;
+    const tam=p.tam;
+    const precoTxt = tam ? ['P','M','G','GG'].map(k=>`${k} ${R(tam[k])}`).join(' · ') : R(p.preco);
+    const precoCell = precoEditId===p.id
+      ? (tam
+          ? `<div class="row" style="gap:6px">${['P','M','G','GG'].map(k=>`<span style="font-size:11px;color:var(--mut)">${k}</span><input id="pe${p.id}${k}" type="number" min="0" step="0.01" value="${tam[k]}" style="width:86px;padding:6px">`).join('')}<button class="btn" style="padding:6px 10px" onclick="salvarPreco(${p.id})">Salvar</button><button class="ghost" style="padding:6px 10px" onclick="cancelPreco()">×</button></div>`
+          : `<div class="row"><input id="pe${p.id}" type="number" min="0" step="0.01" value="${p.preco}" style="width:110px"><button class="btn" style="padding:6px 10px" onclick="salvarPreco(${p.id})">Salvar</button><button class="ghost" style="padding:6px 10px" onclick="cancelPreco()">×</button></div>`)
+      : `<div class="row"><span style="font-size:13px">${precoTxt}</span><button class="ghost" style="padding:4px 8px;font-size:11px" onclick="editarPreco(${p.id})">Editar</button></div>`;
+    return [`<b>${esc(p.nome)}</b>`, esc(p.categoria||''), precoCell, R(c), `<span class="tag ${m>=50?'t-ok':m>=30?'t-warn':'t-bad'}">${m}%</span>`,
+      `<button class="ghost" style="padding:6px 10px" onclick="toggleProd(${p.id})">${p.status==='Pausado'?'Pausado':'Ativo'}</button>`,
+      `<div class="row"><button class="ghost" style="padding:6px 10px" onclick="abrirFichaProd(${p.id})">Ficha técnica</button><button class="danger" onclick="apagar('produtos',${p.id})">Excluir</button></div>`]; });
+  return head('Produtos','Produtos e custos')+seed+form+`<div class="card">${rows.length?tabela(['Produto','Categoria','Preço','Custo','Margem','Status',''],rows):'<div class="empty">Nenhum produto cadastrado.</div>'}</div>`;
+}
+window.editarPreco=(id)=>{ precoEditId=id; render(); };
+window.cancelPreco=()=>{ precoEditId=null; render(); };
+window.salvarPreco=async (id)=>{
+  const p=T.produtos.find(x=>x.id===id); if(!p) return;
+  if(p.tam){
+    const tam={};
+    for(const k of ['P','M','G','GG']){ const v=Number(document.getElementById('pe'+id+k)?.value||0); if(!(v>0)){ alert('Informe preços maiores que zero em todos os tamanhos.'); return; } tam[k]=v; }
+    await salvar('produtos',{...p,tam,preco:tam.M}); precoEditId=null; render(); return;
+  }
+  const v=Number(document.getElementById('pe'+id)?.value||0);
+  if(!(v>0)){ alert('Informe um preço maior que zero.'); return; }
+  await salvar('produtos',{...p,preco:v}); precoEditId=null; render();
+};
+window.importarCardapio=async ()=>{
+  for(const [nome,categoria,preco] of CATALOGO){
+    const existe=T.produtos.find(x=>x.nome===nome);
+    if(existe){ if(existe.preco===undefined && preco.preco!==undefined){} continue; }
+    await salvar('produtos',{nome,categoria,...preco,status:'Ativo',ficha:[]});
+  }
+  render();
+};
+window.addProd=async ()=>{ const nome=$('qn').value.trim(); const preco=Number($('qp').value||0);
+  if(nome.length<3||preco<=0){ $('qmsg').textContent='Informe o nome e um preço maior que zero.'; return; }
+  await salvar('produtos',{nome,categoria:$('qc').value,preco,status:'Ativo',ficha:[]}); render(); };
+window.toggleProd=async (id)=>{ const p=T.produtos.find(x=>x.id===id); if(!p) return; await salvar('produtos',{...p,status:p.status==='Pausado'?'Ativo':'Pausado'}); render(); };
+window.abrirFichaProd=(id)=>{ const p=T.produtos.find(x=>x.id===id); fichaP={id,ficha:(p.ficha||[]).map(f=>({...f}))}; render(); };
+window.fecharFichaProd=()=>{ fichaP=null; render(); };
+function guardaFicha(){ fichaP.ficha=fichaP.ficha.map((_,i)=>({ingId:Number(document.getElementById('fi'+i).value),qtd:Number(document.getElementById('fq'+i).value||0)})); }
+window.addFichaRow=()=>{ guardaFicha(); fichaP.ficha.push({ingId:(T.estoque[0]?.id||0),qtd:1}); render(); };
+window.rmFichaRow=(i)=>{ guardaFicha(); fichaP.ficha.splice(i,1); render(); };
+window.salvarFicha=async ()=>{ guardaFicha(); const p=T.produtos.find(x=>x.id===fichaP.id); await salvar('produtos',{...p,ficha:fichaP.ficha}); fichaP=null; render(); };
+function vFichaProd(){
+  const p=T.produtos.find(x=>x.id===fichaP.id);
+  const ing=T.estoque.map(e=>`<option value="${e.id}">${esc(e.nome)} (${esc(e.unidade||'')})</option>`).join('');
+  const linhas=fichaP.ficha.map((f,i)=>`<div class="form" style="grid-template-columns:2fr 1fr auto"><div><select id="fi${i}">${T.estoque.map(e=>`<option value="${e.id}" ${e.id===Number(f.ingId)?'selected':''}>${esc(e.nome)} (${esc(e.unidade||'')})</option>`).join('')}</select></div><div><input id="fq${i}" type="number" min="0" step="0.001" value="${f.qtd}"></div><div><button class="danger" onclick="rmFichaRow(${i})">Remover</button></div></div>`).join('');
+  return head('Ficha técnica', esc(p.nome), `<button class="ghost" onclick="fecharFichaProd()">← Voltar</button>`)+
+  `<div class="card gold"><p style="color:var(--mut);margin-top:0">Quantidade de cada ingrediente usada em <b>1 unidade</b> deste prato, na mesma unidade do estoque.</p>${linhas||'<div class="empty" style="padding:14px">Nenhum ingrediente na ficha.</div>'}
+  <div class="row" style="margin-top:12px;justify-content:space-between"><button class="ghost" onclick="addFichaRow()" ${T.estoque.length?'':'disabled'}>+ Ingrediente</button>
+  <div><span style="color:var(--mut)">Custo estimado:</span> <b style="color:var(--gold2)">${R(custoProd({ficha:fichaP.ficha}))}</b> &nbsp; <button class="btn" onclick="salvarFicha()">Salvar ficha</button></div></div></div>`;
+}
+function vFin(){
+  const c=calc();
+  const form=`<div class="card" style="margin-bottom:16px"><div class="form">
+    <div><label>Data</label><input id="dd" type="date"></div><div><label>Descrição</label><input id="dn"></div>
+    <div><label>Valor (R$)</label><input id="dv" type="number" min="0" step="0.01"></div>
+    <div><label>Categoria</label><select id="dc"><option>Insumos</option><option>Embalagens</option><option>Taxas</option><option>Outros</option></select></div>
+    <div><button class="btn" onclick="addDesp()">Lançar despesa</button></div></div><div class="msg" id="dmsg"></div></div>`;
+  const rows=T.despesas.slice().sort((a,b)=>String(b.data).localeCompare(String(a.data))).map(d=>[esc(d.data||''),esc(d.descricao),esc(d.categoria),R(d.valor),`<button class="danger" onclick="apagar('despesas',${d.id})">Excluir</button>`]);
+  const pct = c.fat ? Math.max(0,Math.min(100,Math.round(c.lucro/c.fat*100))) : 0;
+  const hoje=new Date().toISOString().slice(0,10);
+  const pagar=T.contas.filter(x=>x.tipo==='pagar'&&!x.pago), receber=T.contas.filter(x=>x.tipo==='receber'&&!x.pago);
+  const soma=l=>l.reduce((a,x)=>a+Number(x.valor||0),0);
+  const cfg=CFG(); const meta=Number(cfg.metaFaturamento||0); const prog=meta?Math.min(100,Math.round(c.fat/meta*100)):0;
+  const formas=FORMAS.map(f=>{const v=T.pedidos.filter(p=>p.status!=='Cancelado'&&(p.forma||'Pix')===f).reduce((a,p)=>a+Number(p.total||0),0);return [f,R(v)];});
+  const taxa=T.pedidos.filter(p=>p.status!=='Cancelado'&&p.forma==='Cartão').reduce((a,p)=>a+Number(p.total||0),0)*Number(cfg.taxaCartao||0)/100;
+  const contasRows=T.contas.slice().sort((a,b)=>String(a.vencimento).localeCompare(String(b.vencimento))).map(x=>{
+    const st=x.pago?'<span class="tag t-ok">Pago</span>':(x.vencimento&&x.vencimento<hoje)?'<span class="tag t-bad">Vencido</span>':(x.vencimento===hoje?'<span class="tag t-warn">Vence hoje</span>':'<span class="tag t-mut">Em dia</span>');
+    return [esc(x.tipo==='pagar'?'A pagar':'A receber'),esc(x.descricao),esc(x.vencimento||'-'),R(x.valor),st,`<div class="row"><button class="ghost" style="padding:6px 10px" onclick="toggleConta(${x.id})">${x.pago?'Reabrir':'Baixar'}</button><button class="danger" onclick="apagar('contas',${x.id})">Excluir</button></div>`];});
+  const contasHtml=`<div class="grid k2" style="margin-top:16px">
+    <div class="card"><h3 class="sect">Contas a pagar em aberto</h3><div style="font-size:22px;color:var(--gold2)">${R(soma(pagar))}</div></div>
+    <div class="card"><h3 class="sect">Contas a receber em aberto</h3><div style="font-size:22px;color:var(--gold2)">${R(soma(receber))}</div></div></div>
+    <div class="card" style="margin-top:16px"><div class="form"><div><label>Tipo</label><select id="ctipo"><option value="pagar">A pagar</option><option value="receber">A receber</option></select></div>
+    <div><label>Descrição</label><input id="cd"></div><div><label>Valor (R$)</label><input id="cv" type="number" min="0" step="0.01"></div><div><label>Vencimento</label><input id="cvv" type="date"></div>
+    <div><button class="btn" onclick="addConta()">Lançar</button></div></div><div class="msg" id="cmsg2"></div>
+    ${contasRows.length?tabela(['Tipo','Descrição','Vencimento','Valor','Situação',''],contasRows):'<div class="empty">Nenhuma conta lançada.</div>'}</div>`;
+  const barras=(titulo,itens)=>{ const max=Math.max(1,...itens.map(i=>i[1])); return `<div class="card"><h3 class="sect">${titulo}</h3>${itens.length?itens.map(([n,v])=>`<div style="margin:8px 0"><div class="row" style="justify-content:space-between"><span>${esc(n)}</span><span>${R(v)}</span></div><div class="bar"><i style="width:${Math.round(v/max*100)}%"></i></div></div>`).join(''):'<div class="empty">Sem dados.</div>'}</div>`; };
+  const porDia={}; T.pedidos.filter(p=>p.status!=='Cancelado').forEach(p=>{const d=p.dataEntrega||'a combinar'; porDia[d]=(porDia[d]||0)+Number(p.total||0);});
+  const graficos=`<div class="grid k2" style="margin-top:16px">${barras('Vendas por data de entrega',Object.entries(porDia).sort())}${barras('Recebimento por forma de pagamento',FORMAS.map(f=>[f,T.pedidos.filter(p=>p.status!=='Cancelado'&&(p.forma||'Pix')===f).reduce((a,p)=>a+Number(p.total||0),0)]))}</div>`;
+  const metaHtml=`<div class="card" style="margin-top:16px"><div class="row" style="justify-content:space-between"><h3 class="sect" style="margin:0">Meta de faturamento</h3><div class="row"><input id="mt" type="number" min="0" value="${meta||''}" placeholder="R$ meta" style="width:160px"><input id="tc" type="number" min="0" step="0.1" value="${cfg.taxaCartao}" style="width:120px" title="Taxa do cartão (%)"><button class="ghost" onclick="salvarMeta()">Salvar</button></div></div>
+    <div style="margin-top:12px">${meta?`<div class="row" style="justify-content:space-between"><span>${R(c.fat)} de ${R(meta)}</span><span>${prog}%</span></div><div class="bar"><i style="width:${prog}%"></i></div>`:'<div class="empty" style="padding:14px">Defina uma meta para acompanhar o progresso.</div>'}</div>
+    <div class="row" style="margin-top:12px;justify-content:space-between;color:var(--mut)"><span>Taxa estimada do cartão</span><b style="color:var(--gold2)">${R(taxa)}</b></div></div>`;
+  return head('Financeiro','Financeiro')+metaHtml+graficos+contasHtml+
+  `<div class="grid k4" style="margin-bottom:16px">${kpi('Faturamento',R(c.fat),'pedidos ativos')}${kpi('Despesas',R(c.desp),'lançadas')}${kpi('Lucro',R(c.lucro),pct+'% da receita')}${kpi('Ticket médio',R(c.ticket),'por pedido')}</div>
+  <div class="card" style="margin-bottom:16px"><div class="muted" style="color:var(--mut);font-size:12px">Margem de lucro</div><div class="bar"><i style="width:${pct}%"></i></div></div>`+
+  form+`<div class="card">${rows.length?tabela(['Data','Descrição','Categoria','Valor',''],rows):'<div class="empty">Nenhuma despesa lançada.</div>'}</div>`;
+}
+window.addDesp = async ()=>{
+  const d=$('dn').value.trim(); const v=Number($('dv').value||0);
+  if(!d||v<=0){ $('dmsg').textContent='Informe a descrição e o valor.'; return; }
+  await salvar('despesas',{data:$('dd').value, descricao:d, valor:v, categoria:$('dc').value}); render();
+};
+</script></body></html>
